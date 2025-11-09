@@ -18,8 +18,8 @@ const features = [
     color: 'from-blue-600 to-indigo-600'
   },
   { 
-    title: 'Guided Workflows', 
-    description: 'Navigate complex maintenance tasks with confidence using AI-generated step-by-step workflows tailored to each work order.',
+    title: 'Smart Work Blocks', 
+    description: 'Automatically optimize your daily workflow by intelligently sorting tickets by priority and location, minimizing travel time across pods and racks.',
     icon: Workflow,
     color: 'from-cyan-500 to-blue-500'
   }

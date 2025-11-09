@@ -16,7 +16,7 @@ export default function Navbar() {
         href="/" 
         className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors"
       >
-        HACKUTD 25
+        KANBAN SYNC
       </Link>
 
       <div className="flex items-center gap-3">

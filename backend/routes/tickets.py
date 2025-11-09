@@ -79,21 +79,21 @@ async def get_user_id_by_email(email: str) -> Optional[str]:
 
 
 async def get_current_user_id(authorization: Optional[str] = Header(None)) -> Optional[str]:
-    if not authorization or not authorization.startswith("Bearer "):
-        return None
+    # if not authorization or not authorization.startswith("Bearer "):
+    #     return None
     
-    try:
-        token = authorization.replace("Bearer ", "")
+    # try:
+    #     token = authorization.replace("Bearer ", "")
         
-        decoded = jwt.decode(token, options={"verify_signature": False})
+    #     decoded = jwt.decode(token, options={"verify_signature": False})
         
-        # Clerk stores user ID in 'sub' claim
-        user_id = decoded.get('sub')
-        return user_id
-    except Exception as e:
-        print(f"Auth error: {e}")
-        return None
-    # return "user_35DyPmnDNyI6iqNHvS1D20M4Bcc"
+    #     # Clerk stores user ID in 'sub' claim
+    #     user_id = decoded.get('sub')
+    #     return user_id
+    # except Exception as e:
+    #     print(f"Auth error: {e}")
+    #     return None
+    return "user_35DyPmnDNyI6iqNHvS1D20M4Bcc"
 
 
 async def get_user_role(user_id: Optional[str] = None) -> Optional[str]:

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Server, Cpu, Zap } from 'lucide-react';
+import { Server, Cpu, Zap, AlertTriangle } from 'lucide-react';
 
 export type DeviceType = 'H100' | 'Server' | 'PDU' | 'Switch' | 'Cable';
 
@@ -15,6 +15,8 @@ export const DeviceIcon: React.FC<DeviceIconProps> = ({ type }) => {
     Switch: Server,
     Cable: Zap
   };
-  const Icon = icons[type];
+
+  const Icon = icons[type] ?? AlertTriangle;
+
   return <Icon className="w-5 h-5" />;
 };

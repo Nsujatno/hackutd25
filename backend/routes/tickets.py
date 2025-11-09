@@ -93,6 +93,7 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> Op
     except Exception as e:
         print(f"Auth error: {e}")
         return None
+    # return "user_35DyPmnDNyI6iqNHvS1D20M4Bcc"
 
 
 async def get_user_role(user_id: Optional[str] = None) -> Optional[str]:
@@ -225,18 +226,18 @@ async def get_my_tickets(
 @router.patch("/{ticket_id}/status")
 async def update_ticket_status(
     ticket_id: str,
-    status_update: TicketStatusUpdate,
+    status_update: TicketStatusUpdate,  # Pydantic model for body
     current_user_id: Optional[str] = Depends(get_current_user_id)
 ):
-    """
-    Update ticket status (for Kanban drag-and-drop).
-    Technicians can only update their assigned tickets.
-    """
+    """Update ticket status (for Kanban drag-and-drop)"""
     new_status = status_update.status
     
     # Validate status
     if new_status not in ["ready", "in_progress", "complete"]:
-        raise HTTPException(status_code=400, detail="Invalid status")
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid status: {new_status}. Must be one of: ready, in_progress, complete"
+        )
     
     try:
         # Build update data
@@ -248,19 +249,23 @@ async def update_ticket_status(
         elif new_status == "complete":
             update_data["completed_at"] = "now()"
         
-        # RLS will automatically prevent unauthorized updates
+        # Update in Supabase
         result = supabase.table("tickets")\
             .update(update_data)\
             .eq("id", ticket_id)\
             .execute()
         
         if not result.data:
-            raise HTTPException(status_code=404, detail="Ticket not found or unauthorized")
+            raise HTTPException(
+                status_code=404, 
+                detail="Ticket not found or unauthorized"
+            )
         
         return {"success": True, "ticket": result.data[0]}
     except HTTPException:
         raise
     except Exception as e:
+        print(f"Error updating ticket: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

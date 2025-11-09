@@ -107,6 +107,16 @@ export default function KanbanBoard() {
         suggestions: ticket.suggestions ? JSON.parse(ticket.suggestions) : [],
         priorityJustification: ticket.priority_justification || '',
         assignedToEmail: ticket.assigned_to_email || ticket.assigned_to || '',
+        switchName: ticket.switch || undefined,
+        ports: (() => {
+          if (!ticket.ports) return undefined;
+          if (Array.isArray(ticket.ports)) return ticket.ports;
+          try {
+            return JSON.parse(ticket.ports);
+          } catch {
+            return undefined;
+          }
+        })(),
       }));
 
       setTickets(transformedTickets);

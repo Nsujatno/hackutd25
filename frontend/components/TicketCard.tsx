@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Clock, ChevronDown, ChevronUp, FileText, AlertTriangle, Lightbulb, BookOpen, Mail } from 'lucide-react';
+import { MapPin, Clock, ChevronDown, ChevronUp, FileText, AlertTriangle, Lightbulb, BookOpen, Mail, Network } from 'lucide-react';
 import { DeviceIcon, DeviceType } from './DeviceIcon';
 
 export type Priority = 'P0' | 'P1' | 'P2' | 'P3' | 'P4';
@@ -16,12 +16,14 @@ export interface Ticket {
   estimatedDuration: number;
   createdAt: Date;
   description: string;
-  assignedToEmail?: string; // Added field for assigned email
+  assignedToEmail?: string;
   inventory?: string[];
   technicalRequirements?: string[];
   warnings?: string[];
   suggestions?: string[];
   priorityJustification?: string;
+  switchName?: string;
+  ports?: string[];
 }
 
 const priorityColors: Record<Priority, string> = {
@@ -111,11 +113,25 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onExpand, isDrag
         <span>{ticket.location}</span>
       </div>
 
-      {/* New section displaying assigned email */}
+      {/* Assigned email */}
       {ticket.assignedToEmail && (
         <div className="flex items-center gap-1 text-sm text-gray-700 mb-2">
           <Mail className="w-4 h-4 text-gray-400" />
           <span>Assigned to: {ticket.assignedToEmail}</span>
+        </div>
+      )}
+
+      {/* Switch and Ports - Compact View */}
+      {(ticket.switchName || (ticket.ports && ticket.ports.length > 0)) && (
+        <div className="flex items-center gap-1 text-sm text-gray-700 mb-2">
+          <Network className="w-4 h-4 text-gray-400" />
+          <span>
+            {ticket.switchName && <span className="font-medium">{ticket.switchName}</span>}
+            {ticket.switchName && ticket.ports && ticket.ports.length > 0 && <span> • </span>}
+            {ticket.ports && ticket.ports.length > 0 && (
+              <span>{ticket.ports.length} port{ticket.ports.length !== 1 ? 's' : ''}</span>
+            )}
+          </span>
         </div>
       )}
 
@@ -144,6 +160,39 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onExpand, isDrag
               <p className="text-sm text-gray-700 leading-relaxed">{ticket.description}</p>
             </div>
 
+            {/* Switch and Ports - Expanded View */}
+            {(ticket.switchName || (ticket.ports && ticket.ports.length > 0)) && (
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <h4 className="text-sm font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+                  <Network className="w-4 h-4" />
+                  Network Information
+                </h4>
+                {ticket.switchName && (
+                  <div className="mb-2">
+                    <span className="text-xs text-indigo-600 font-medium">Switch: </span>
+                    <span className="text-sm text-indigo-900 font-semibold">{ticket.switchName}</span>
+                  </div>
+                )}
+                {ticket.ports && ticket.ports.length > 0 && (
+                  <div>
+                    <span className="text-xs text-indigo-600 font-medium mb-1 block">
+                      Ports ({ticket.ports.length}):
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ticket.ports.map((port, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-md font-medium"
+                        >
+                          {port}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Priority Justification */}
             {ticket.priorityJustification && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -165,7 +214,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onExpand, isDrag
                 <ul className="space-y-1">
                   {ticket.warnings.map((warning, idx) => (
                     <li key={idx} className="text-sm text-yellow-700 flex items-start gap-2">
-                      <span className="text-yellow-500 mt-0.5 flex-shrink-0">•</span>
+                      <span className="text-yellow-500 mt-0.5 shrink-0">•</span>
                       <span className="leading-relaxed">{warning}</span>
                     </li>
                   ))}
@@ -183,7 +232,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onExpand, isDrag
                 <ul className="space-y-1">
                   {ticket.suggestions.map((suggestion, idx) => (
                     <li key={idx} className="text-sm text-green-700 flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5 flex-shrink-0">•</span>
+                      <span className="text-green-500 mt-0.5 shrink-0">•</span>
                       <span className="leading-relaxed">{suggestion}</span>
                     </li>
                   ))}

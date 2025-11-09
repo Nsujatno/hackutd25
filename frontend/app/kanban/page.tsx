@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Header } from '../../components/Header';
+// import { Header } from '../../components/Header';
 import { BoardColumn } from '../../components/BoardColumn';
 import { Ticket, TicketStatus } from '../../components/TicketCard';
 
@@ -22,6 +22,7 @@ export default function KanbanBoard() {
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isGeneratingWorkflow, setIsGeneratingWorkflow] = useState(false);
 
   const columns: { title: string; status: TicketStatus }[] = [
     { title: 'Ready', status: 'ready' },
@@ -101,7 +102,7 @@ export default function KanbanBoard() {
         warnings: ticket.warnings ? JSON.parse(ticket.warnings) : [],
         suggestions: ticket.suggestions ? JSON.parse(ticket.suggestions) : [],
         priorityJustification: ticket.priority_justification || '',
-        assignedToEmail: ticket.assigned_to_email || ticket.assigned_to || '', // map assigned email or fallback
+        assignedToEmail: ticket.assigned_to_email || ticket.assigned_to || '',
       }));
 
       setTickets(transformedTickets);
@@ -168,10 +169,69 @@ export default function KanbanBoard() {
     setIsDragging(true);
   };
 
+  const generateWorkBlock = async () => {
+    setIsGeneratingWorkflow(true);
+    
+    try {
+      // Get all tickets in 'ready' status
+      const readyTickets = tickets.filter(t => t.status === 'ready');
+      
+      if (readyTickets.length === 0) {
+        alert('No tickets in Ready status to organize');
+        setIsGeneratingWorkflow(false);
+        return;
+      }
+      
+      // Priority order mapping (P0 is most critical, P4 is least critical)
+      const getPriorityValue = (priority: string): number => {
+        const match = priority.match(/P(\d+)/i);
+        if (match) {
+          return parseInt(match[1], 10);
+        }
+        // Fallback for non-standard priority formats
+        return 999;
+      };
+      
+      // Sort by priority first (P0 -> P4), then by location (pod)
+      const sortedTickets = [...readyTickets].sort((a, b) => {
+        // Compare priority first
+        const priorityA = getPriorityValue(a.priority);
+        const priorityB = getPriorityValue(b.priority);
+        
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+        
+        // If same priority, sort by location (pod)
+        const locationA = a.location.toLowerCase();
+        const locationB = b.location.toLowerCase();
+        return locationA.localeCompare(locationB);
+      });
+      
+      // Simulate API processing time
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      console.log('Optimized work order:', sortedTickets.map(t => ({
+        title: t.title,
+        priority: t.priority,
+        location: t.location
+      })));
+      
+      // Here you can add logic to display the optimized order or update ticket metadata
+      alert(`Workflow optimized! ${sortedTickets.length} tickets organized by priority (P0→P4) and location.`);
+      
+    } catch (error) {
+      console.error('Error generating work block:', error);
+      alert('Failed to generate work block. Please try again.');
+    } finally {
+      setIsGeneratingWorkflow(false);
+    }
+  };
+
   if (userRoleLoading || userRole === null) {
     return (
       <div className="h-screen flex flex-col bg-gray-50">
-        <Header />
+        {/* <Header /> */}
         <div className="flex-1 flex items-center justify-center">
           <p className="text-gray-600 text-lg">Loading user information...</p>
         </div>
@@ -182,7 +242,7 @@ export default function KanbanBoard() {
   if (!isLoaded) {
     return (
       <div className="h-screen flex flex-col bg-gray-50">
-        <Header />
+        {/* <Header /> */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -196,7 +256,7 @@ export default function KanbanBoard() {
   if (!isSignedIn) {
     return (
       <div className="h-screen flex flex-col bg-gray-50">
-        <Header />
+        {/* <Header /> */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-600 text-lg mb-4">Please sign in to view tickets</p>
@@ -215,7 +275,7 @@ export default function KanbanBoard() {
   if (loading) {
     return (
       <div className="h-screen flex flex-col bg-gray-50">
-        <Header />
+        {/* <Header /> */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -229,7 +289,7 @@ export default function KanbanBoard() {
   if (error) {
     return (
       <div className="h-screen flex flex-col bg-gray-50">
-        <Header />
+        {/* <Header /> */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 mb-4 text-lg">{error}</p>
@@ -246,24 +306,49 @@ export default function KanbanBoard() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      <Header />
-      <div className="flex-1 flex flex-col">
-        {/* Add Ticket button - visible only for admin/ticket_creator */}
-        {userRole === 'admin' && (
-          <div className="p-6 border-b border-gray-200 flex justify-end sticky top-0 bg-gray-50 z-10">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* <Header /> */}
+      
+      {/* Loading overlay for workflow generation */}
+      {isGeneratingWorkflow && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center shadow-xl">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+            <p className="text-gray-700 text-lg font-medium">Generating Optimized Workflow...</p>
+            <p className="text-gray-500 text-sm mt-2">Sorting by priority and location</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Action buttons */}
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 z-10 flex-shrink-0">
+          <button
+            onClick={generateWorkBlock}
+            disabled={userRole === 'admin' || isGeneratingWorkflow}
+            className={`px-4 py-2 rounded transition ${
+              userRole === 'admin' || isGeneratingWorkflow
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+            title={userRole === 'admin' ? 'Only engineers can generate work blocks' : 'Generate optimized work block'}
+          >
+            {isGeneratingWorkflow ? 'Generating...' : 'Generate Work Block'}
+          </button>
+          
+          {userRole === 'admin' && (
             <button
               onClick={() => router.push('/create-ticket')}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
             >
               + Create Ticket
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 overflow-x-auto p-6">
-            <div className="flex gap-4 min-w-max">
+        <div className="flex-1 overflow-auto min-h-0">
+          <div className="p-6">
+            <div className="flex gap-4">
               {columns.map((col) => (
                 <BoardColumn
                   key={col.status}

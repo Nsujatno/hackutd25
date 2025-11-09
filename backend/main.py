@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 from routes import users
 from routes import webhooks
+from routes import rag
+from routes import tickets
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -18,6 +20,8 @@ app.add_middleware(
 
 app.include_router(users.router, prefix="/users")
 app.include_router(webhooks.router)
+app.include_router(rag.router, prefix="/api")
+app.include_router(tickets.router)
 
 @app.get("/")
 def read_root():

@@ -42,8 +42,8 @@ export default function HeroSection() {
 
           <div className="mt-6 flex flex-wrap gap-4">
             <NextLink
-              href="/homepage"
-              className="inline-flex items-center gap-2 cursor-pointer rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 active:scale-95"
+              href="/kanban"
+              className="inline-block cursor-pointer rounded-full bg-white px-6 py-3 font-medium text-black transition-transform active:scale-95 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
             >
               Get Started
               <ArrowRight className="w-4 h-4" />

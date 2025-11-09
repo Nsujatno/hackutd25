@@ -1,4 +1,4 @@
-"use client"; // This is required because Clerk components are client-side
+"use client";
 
 import {
   SignInButton,
@@ -11,27 +11,29 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="flex justify-between items-center p-4 gap-4 h-16 bg-[#0f0f0f]">
-      <Link href="/" className="text-xl font-bold">
+    <header className="sticky top-0 z-50 flex justify-between items-center px-6 h-16 bg-white border-b border-gray-200 backdrop-blur-sm bg-white/95">
+      <Link 
+        href="/" 
+        className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+      >
         HACKUTD 25
       </Link>
 
-      {/* This div keeps your auth buttons grouped on the right */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <SignedOut>
           <SignInButton>
-            <button className="text-ceramic-white rounded-full font-montserrat text-sm sm:text-base h-10 px-4 cursor-pointer">
+            <button className="text-gray-700 hover:text-gray-900 rounded-lg font-medium text-sm px-4 py-2 transition-colors">
               Sign In
             </button>
           </SignInButton>
           <SignUpButton>
-            <button className="bg-transparent border-2 border-[#554069] text-ceramic-white rounded-full font-montserrat text-sm sm:text-base h-10 px-4 cursor-pointer hover:bg-[#554069] transition-colors">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm px-4 py-2 transition-colors shadow-sm">
               Sign Up
             </button>
           </SignUpButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </SignedIn>
       </div>
     </header>

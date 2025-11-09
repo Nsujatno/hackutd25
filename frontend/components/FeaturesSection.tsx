@@ -2,25 +2,25 @@
 
 import { motion } from 'framer-motion';
 import { Element } from "react-scroll";
-import { Zap, Shield, Puzzle } from 'lucide-react';
+import { Bot, Database, Workflow } from 'lucide-react';
 
 const features = [
   { 
-    title: 'Lightning Fast', 
-    description: 'Experience ultra-smooth performance with optimized workflows and real-time updates.',
-    icon: Zap,
+    title: 'AI-Powered Ticketing', 
+    description: 'Generate complete work orders in seconds with our intelligent LLM system that understands datacenter operations and validates against real-time data.',
+    icon: Bot,
     color: 'from-blue-500 to-cyan-500'
   },
   { 
-    title: 'Next-level Security', 
-    description: 'Your data is encrypted using state-of-the-art protocols and industry best practices.',
-    icon: Shield,
+    title: 'Dual RAG System', 
+    description: 'Get instant help with equipment manuals and procedures while ensuring ticket accuracy through automated validation against datacenter infrastructure.',
+    icon: Database,
     color: 'from-blue-600 to-indigo-600'
   },
   { 
-    title: 'Seamless Integrations', 
-    description: 'Connect instantly with popular apps and services through our unified API.',
-    icon: Puzzle,
+    title: 'Guided Workflows', 
+    description: 'Navigate complex maintenance tasks with confidence using AI-generated step-by-step workflows tailored to each work order.',
+    icon: Workflow,
     color: 'from-cyan-500 to-blue-500'
   }
 ];
@@ -28,9 +28,9 @@ const features = [
 export default function FeaturesSection() {
   return (
     <Element name="features">
-      <section className="bg-gradient-to-b from-white to-gray-50 py-16 w-full flex flex-col items-center border-t border-gray-100 relative overflow-hidden">
+      <section className="bg-linear-to-b from-white to-gray-50 py-16 w-full flex flex-col items-center border-t border-gray-100 relative overflow-hidden">
         {/* Subtle background accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-blue-500/5 rounded-full blur-3xl -z-0"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-blue-500/5 rounded-full blur-3xl z-0"></div>
         
         {/* Features heading matching hero style */}
         <motion.h2 
@@ -58,7 +58,7 @@ export default function FeaturesSection() {
           }}
           className="text-lg md:text-xl text-gray-600 text-center mb-16 max-w-2xl px-6"
         >
-          Everything you need to bring your vision to life
+          Built for technicians managing global data center operations
         </motion.p>
 
         {/* Feature cards */}
@@ -103,7 +103,7 @@ function FeatureCard({ feature, idx }: { feature: typeof features[0], idx: numbe
       }}
     >
       {/* Icon with Gradient Background */}
-      <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
+      <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-linear-to-br ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
         <Icon className="w-7 h-7 text-white" />
       </div>
 

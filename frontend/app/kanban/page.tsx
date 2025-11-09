@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { BoardColumn } from '../../components/BoardColumn';
 import { Ticket, TicketStatus } from '../../components/TicketCard';
 
-type UserRole = 'admin' | 'engineer';
+type UserRole = 'ticket_creator' | 'technician';
 
 // API base URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/tickets';
@@ -57,13 +57,16 @@ export default function KanbanBoard() {
 
       if (response.ok) {
         const data = await response.json();
-        setUserRole(data.role === 'ticket_creator' || data.role === 'admin' ? 'admin' : 'engineer');
+        // Store the actual role from backend: 'ticket_creator' or 'technician'
+        setUserRole(data.role as UserRole);
+        console.log('User role fetched:', data.role);
       } else {
-        setUserRole('engineer');
+        // Default to technician if fetch fails
+        setUserRole('technician');
       }
     } catch (err) {
       console.error('Error fetching user role:', err);
-      setUserRole('engineer');
+      setUserRole('technician');
     }
   };
 
@@ -74,7 +77,8 @@ export default function KanbanBoard() {
       const token = await getToken();
       if (!token) throw new Error('Not authenticated');
 
-      const endpoint = userRole === 'admin' ? `${API_BASE_URL}/list` : `${API_BASE_URL}/my-tickets`;
+      // ticket_creator sees all tickets, technician sees only assigned tickets
+      const endpoint = userRole === 'ticket_creator' ? `${API_BASE_URL}/list` : `${API_BASE_URL}/my-tickets`;
 
       const response = await fetch(endpoint, {
         method: 'GET',
@@ -192,7 +196,19 @@ export default function KanbanBoard() {
         return 999;
       };
       
-      // Sort by priority first (P0 -> P4), then by location (pod)
+      // Extract pod number from location string
+      const extractPodNumber = (location: string): number => {
+        const match = location.match(/pod\s*(\d+)/i);
+        return match ? parseInt(match[1], 10) : 999;
+      };
+      
+      // Extract rack number from location string
+      const extractRackNumber = (location: string): number => {
+        const match = location.match(/rack\s*(\d+)/i);
+        return match ? parseInt(match[1], 10) : 999;
+      };
+      
+      // Sort by priority first (P0 -> P4), then by pod number, then by rack
       const sortedTickets = [...readyTickets].sort((a, b) => {
         // Compare priority first
         const priorityA = getPriorityValue(a.priority);
@@ -202,10 +218,19 @@ export default function KanbanBoard() {
           return priorityA - priorityB;
         }
         
-        // If same priority, sort by location (pod)
-        const locationA = a.location.toLowerCase();
-        const locationB = b.location.toLowerCase();
-        return locationA.localeCompare(locationB);
+        // If same priority, sort by pod number
+        const podA = extractPodNumber(a.location);
+        const podB = extractPodNumber(b.location);
+        
+        if (podA !== podB) {
+          return podA - podB;
+        }
+        
+        // If same pod, sort by rack number
+        const rackA = extractRackNumber(a.location);
+        const rackB = extractRackNumber(b.location);
+        
+        return rackA - rackB;
       });
       
       // Simulate API processing time
@@ -214,10 +239,20 @@ export default function KanbanBoard() {
       console.log('Optimized work order:', sortedTickets.map(t => ({
         title: t.title,
         priority: t.priority,
-        location: t.location
+        location: t.location,
+        priorityValue: getPriorityValue(t.priority),
+        podNumber: extractPodNumber(t.location),
+        rackNumber: extractRackNumber(t.location)
       })));
       
-      // Here you can add logic to display the optimized order or update ticket metadata
+      // Update the tickets state with the sorted order
+      // Keep tickets from other statuses in their original positions
+      setTickets(prevTickets => {
+        const inProgressTickets = prevTickets.filter(t => t.status === 'in_progress');
+        const completeTickets = prevTickets.filter(t => t.status === 'complete');
+        return [...sortedTickets, ...inProgressTickets, ...completeTickets];
+      });
+      
       alert(`Workflow optimized! ${sortedTickets.length} tickets organized by priority (P0→P4) and location.`);
       
     } catch (error) {
@@ -322,21 +357,25 @@ export default function KanbanBoard() {
       
       <div className="flex-1 flex flex-col min-h-0">
         {/* Action buttons */}
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 z-10 flex-shrink-0">
-          <button
-            onClick={generateWorkBlock}
-            disabled={userRole === 'admin' || isGeneratingWorkflow}
-            className={`px-4 py-2 rounded transition ${
-              userRole === 'admin' || isGeneratingWorkflow
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-            title={userRole === 'admin' ? 'Only engineers can generate work blocks' : 'Generate optimized work block'}
-          >
-            {isGeneratingWorkflow ? 'Generating...' : 'Generate Work Block'}
-          </button>
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 z-10 shrink-0">
+          {/* Technicians can generate workflow */}
+          {userRole === 'technician' && (
+            <button
+              onClick={generateWorkBlock}
+              disabled={isGeneratingWorkflow}
+              className={`px-4 py-2 rounded transition ${
+                isGeneratingWorkflow
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+              title="Generate optimized work block"
+            >
+              {isGeneratingWorkflow ? 'Generating...' : 'Generate Work Block'}
+            </button>
+          )}
           
-          {userRole === 'admin' && (
+          {/* Ticket creators can create tickets */}
+          {userRole === 'ticket_creator' && (
             <button
               onClick={() => router.push('/create-ticket')}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"

@@ -57,7 +57,7 @@ const sampleTickets: Ticket[] = [
   {
     id: '5',
     title: 'Cable replacement Pod 2',
-    priority: 'P0',
+    priority: 'P4',
     status: 'ready',
     deviceType: 'Cable',
     location: 'Pod 2, Rack 15U',

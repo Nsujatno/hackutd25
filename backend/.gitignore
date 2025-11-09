@@ -9,3 +9,5 @@ env/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+*.pdf

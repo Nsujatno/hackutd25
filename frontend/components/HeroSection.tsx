@@ -25,7 +25,7 @@ export default function HeroSection() {
           <div className="mt-6 flex flex-wrap gap-4">
             {/* Link as button: Get Started (scrolls!) */}
             <NextLink
-              href="/homepage"
+              href="/kanban"
               className="inline-block cursor-pointer rounded-full bg-white px-6 py-3 font-medium text-black transition-transform active:scale-95 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
             >
               Get Started

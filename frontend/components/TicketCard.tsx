@@ -72,13 +72,13 @@ export const TicketCard: React.FC<TicketCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`bg-white rounded-lg shadow-sm border-l-4 ${priorityBorders[ticket.priority]} p-4 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${isDragging ? 'opacity-50 rotate-2' : ''}`}
+      className={`bg-white rounded-2xl shadow-lg border-t-3 ${priorityBorders[ticket.priority]} px-6 py-4 cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow ${isDragging ? 'opacity-50 rotate-2' : ''}`}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
-          <GripVertical className="w-4 h-4 text-gray-400" />
-          <div className={`${priorityColors[ticket.priority]} text-white text-xs font-bold px-2 py-1 rounded`}>
+          {/* <GripVertical className="w-4 h-4 text-gray-400" /> */}
+          <div className={`${priorityColors[ticket.priority]} text-white text-xs font-bold px-7 py-2 rounded-xl`}>
             {ticket.priority}
           </div>
         </div>
@@ -87,17 +87,17 @@ export const TicketCard: React.FC<TicketCardProps> = ({
         </div>
       </div>
       
-      <h3 className="font-semibold text-gray-900 mb-2">{ticket.title}</h3>
+      <h3 className="font-semibold text-gray-900 text-lg mb-2">{ticket.title}</h3>
       
-      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-        <MapPin className="w-4 h-4" />
+      <div className="flex items-center gap-1 text-m text-gray-600 mb-2">
+        <MapPin className="w-5 h-5" />
         <span>{ticket.location}</span>
       </div>
       
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <div className="flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          <span>{ticket.estimatedDuration}min</span>
+      <div className="flex items-center justify-between text-s text-gray-500">
+        <div className="flex items-center gap-2 py-2">
+          <Clock className="w-5 h-5" />
+          <span>{ticket.estimatedDuration} min</span>
         </div>
         <span>{timeAgo(ticket.createdAt)}</span>
       </div>
@@ -116,7 +116,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({
                 <h4 className="text-xs font-semibold text-gray-700 mb-2">Required Inventory:</h4>
                 <div className="flex flex-wrap gap-1">
                   {ticket.inventory.map((item, idx) => (
-                    <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded-md">
                       {item}
                     </span>
                   ))}

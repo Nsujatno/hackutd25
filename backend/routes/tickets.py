@@ -195,7 +195,31 @@ async def list_tickets(
             query = query.eq("status", status)
         
         result = query.execute()
-        return {"tickets": result.data}
+        
+        # Enrich tickets with assigned user email
+        enriched_tickets = []
+        for ticket in result.data:
+            ticket_copy = ticket.copy()
+            
+            # Get assigned user's email if ticket is assigned
+            if ticket.get("assigned_to"):
+                try:
+                    user_result = supabase.table("users")\
+                        .select("email")\
+                        .eq("id", ticket["assigned_to"])\
+                        .single()\
+                        .execute()
+                    
+                    if user_result.data:
+                        ticket_copy["assigned_to_email"] = user_result.data.get("email")
+                except:
+                    ticket_copy["assigned_to_email"] = None
+            else:
+                ticket_copy["assigned_to_email"] = None
+            
+            enriched_tickets.append(ticket_copy)
+        
+        return {"tickets": enriched_tickets}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -218,10 +242,32 @@ async def get_my_tickets(
             .order("created_at", desc=True)\
             .execute()
         
-        return {"tickets": result.data}
+        # Enrich tickets with assigned user email
+        enriched_tickets = []
+        for ticket in result.data:
+            ticket_copy = ticket.copy()
+            
+            # Get assigned user's email
+            if ticket.get("assigned_to"):
+                try:
+                    user_result = supabase.table("users")\
+                        .select("email")\
+                        .eq("id", ticket["assigned_to"])\
+                        .single()\
+                        .execute()
+                    
+                    if user_result.data:
+                        ticket_copy["assigned_to_email"] = user_result.data.get("email")
+                except:
+                    ticket_copy["assigned_to_email"] = None
+            else:
+                ticket_copy["assigned_to_email"] = None
+            
+            enriched_tickets.append(ticket_copy)
+        
+        return {"tickets": enriched_tickets}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.patch("/{ticket_id}/status")
 async def update_ticket_status(

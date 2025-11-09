@@ -1,62 +1,119 @@
 'use client';
+
 import React from 'react';
-import NextLink from 'next/link'; // <-- Rename to avoid name clash
+import NextLink from 'next/link';
 import { Link as ScrollLink } from 'react-scroll';
 import { motion } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#0f0f0f] px-8 py-24 text-white font-sans md:px-16 lg:px-24">
-      {/* Background Effects */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-neutral-900 via-[#0f0f0f] to-[#0f0f0f]"></div>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-1/3 bg-white/5 rounded-full blur-[120px] opacity-10 -z-5"></div>
+    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-gray-50 to-white px-8 py-24 text-gray-900 font-sans md:px-16 lg:px-24">
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(147,197,253,0.08),transparent_50%)]"></div>
+      
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
       <div className="z-10 grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-2">
         {/* Text Content */}
-        <div className="flex flex-col gap-6">
-          <h1 className="text-5xl font-bold tracking-tighter text-transparent bg-clip-text bg-linear-to-b from-white to-neutral-400 md:text-6xl lg:text-7xl">
-            Shape Your Ideas Into Reality
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col gap-6"
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full w-fit mb-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-700">AI-Powered Workflow</span>
+          </div>
+
+          <h1 className="text-5xl font-bold tracking-tight text-gray-900 md:text-6xl lg:text-7xl">
+            Shape Your Ideas Into{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
+              Reality
+            </span>
           </h1>
-          <p className="text-lg text-neutral-400 md:text-xl max-w-lg">
+          
+          <p className="text-lg text-gray-600 md:text-xl max-w-lg leading-relaxed">
             Where focus flows, creation follows. Build, refine, and launch your
             next project with tools designed for clarity.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-4">
-            {/* Link as button: Get Started (scrolls!) */}
             <NextLink
               href="/kanban"
               className="inline-block cursor-pointer rounded-full bg-white px-6 py-3 font-medium text-black transition-transform active:scale-95 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
             >
               Get Started
+              <ArrowRight className="w-4 h-4" />
             </NextLink>
+            
             <ScrollLink
               to="features"
               smooth={true}
               duration={500}
               offset={-10}
-              className="inline-block cursor-pointer rounded-full border border-neutral-700 bg-transparent px-6 py-3 font-medium text-neutral-300 transition-all hover:border-neutral-600 hover:bg-neutral-800/50 hover:text-white"
+              className="inline-flex items-center cursor-pointer rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 active:scale-95"
             >
-              <motion.span
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ scale: 1.04 }}
-                transition={{ duration: 0.13, ease: 'easeOut' }}
-                style={{ display: 'inline-block' }}
-              >
-                Learn More
-              </motion.span>
+              Learn More
             </ScrollLink>
           </div>
-        </div>
-        {/* Orb Visual */}
-        <div className="relative flex h-80 w-full items-center justify-center lg:h-96">
+        </motion.div>
+
+        {/* Visual Element */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative flex h-80 w-full items-center justify-center lg:h-96"
+        >
           <div className="relative flex h-full w-full max-w-md items-center justify-center">
-            <div className="absolute h-72 w-72 rounded-full bg-purple-600 opacity-30 blur-3xl mix-blend-lighten"></div>
-            <div className="absolute h-60 w-60 rounded-full bg-blue-500 opacity-30 blur-3xl mix-blend-lighten"></div>
-            <div className="absolute h-48 w-48 rounded-full bg-pink-500 opacity-30 blur-3xl mix-blend-lighten"></div>
-            <div className="absolute h-40 w-40 rounded-full bg-white/20 opacity-70 blur-2xl"></div>
+            {/* Animated Gradient Orbs */}
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 90, 0]
+              }}
+              transition={{ 
+                duration: 8, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute h-64 w-64 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 opacity-20 blur-3xl"
+            ></motion.div>
+            
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, -90, 0]
+              }}
+              transition={{ 
+                duration: 10, 
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+              className="absolute h-56 w-56 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 opacity-20 blur-3xl"
+            ></motion.div>
+            
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.15, 1],
+              }}
+              transition={{ 
+                duration: 6, 
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2
+              }}
+              className="absolute h-48 w-48 rounded-full bg-gradient-to-br from-blue-300 to-indigo-400 opacity-30 blur-2xl"
+            ></motion.div>
+
+            {/* Center Highlight */}
+            <div className="absolute h-32 w-32 rounded-full bg-white/40 backdrop-blur-md border border-white/60 shadow-2xl"></div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -47,7 +47,7 @@ const sampleTickets: Ticket[] = [
     id: '4',
     title: 'Server diagnostic check',
     priority: 'P3',
-    status: 'validated',
+    status: 'ready',
     deviceType: 'Server',
     location: 'Pod 3, Rack 22U',
     estimatedDuration: 20,
@@ -74,8 +74,6 @@ export default function KanbanBoard() {
   
   const columns: { title: string; status: TicketStatus }[] = userRole === 'admin' 
     ? [
-        { title: 'Draft', status: 'draft' },
-        { title: 'Validated', status: 'validated' },
         { title: 'Ready', status: 'ready' },
         { title: 'In Progress', status: 'in-progress' },
         { title: 'Complete', status: 'complete' }

@@ -4,7 +4,7 @@ import { MapPin, Clock, ChevronDown, ChevronUp, GripVertical } from 'lucide-reac
 import { DeviceIcon, DeviceType } from './DeviceIcon';
 
 export type Priority = 'P0' | 'P1' | 'P2' | 'P3' | 'P4';
-export type TicketStatus = 'draft' | 'validated' | 'ready' | 'in-progress' | 'complete';
+export type TicketStatus = 'ready' | 'in-progress' | 'complete';
 
 export interface Ticket {
   id: string;

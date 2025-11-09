@@ -1,13 +1,16 @@
 from services.datacenter_rag import DatacenterRAG
 from services.rag_service import process_query
+from services.priority_service import PriorityService
 from openai import OpenAI
 from typing import Dict, List
+from db import supabase
 import os
 import json
 
 class TicketValidationService:
     def __init__(self):
         self.datacenter_rag = DatacenterRAG()
+        self.priority_service = PriorityService()
         self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     async def validate_ticket(self, ticket_data: Dict) -> Dict:
@@ -99,3 +102,57 @@ class TicketValidationService:
             "datacenter_context": datacenter_context,
             "technical_context": technical_context
         }
+    
+    async def create_validated_ticket(self, ticket_data: Dict, user_id: str = None) -> Dict:
+        """
+        Complete flow: Validate -> Assign Priority -> Create Ticket in Supabase
+        """
+        # Step 1: Validate the ticket
+        validation_result = await self.validate_ticket(ticket_data)
+        
+        if not validation_result["is_valid"]:
+            return {
+                "success": False,
+                "message": "Ticket validation failed. Please address warnings.",
+                "validation": validation_result
+            }
+        
+        # Step 2: Assign priority
+        priority_result = await self.priority_service.assign_priority(
+            ticket_data, 
+            validation_result
+        )
+        
+        # Step 3: Create ticket in Supabase
+        ticket_record = {
+            "title": f"{ticket_data.get('action', 'INSTALL')} {ticket_data['device']} in {ticket_data['pod']}",
+            "description": ticket_data.get('description', ''),
+            "device": ticket_data['device'],
+            "pod": ticket_data['pod'],
+            "rack": ticket_data.get('rack'),
+            "switch": ticket_data.get('switch'),
+            "ports": ticket_data.get('ports', []),
+            "required_parts": json.dumps(ticket_data.get('required_parts', [])),
+            "priority": priority_result['priority'],
+            "priority_justification": priority_result['justification'],
+            "status": "ready",
+            "technical_requirements": json.dumps(validation_result.get('technical_requirements', [])),
+            "datacenter_context": json.dumps(validation_result.get('datacenter_context', [])),
+            "technical_context": json.dumps(validation_result.get('technical_context', [])),
+            "warnings": json.dumps(validation_result.get('warnings', [])),
+            "suggestions": json.dumps(validation_result.get('suggestions', [])),
+            "estimated_duration_minutes": priority_result.get('estimated_duration_minutes', 30),
+            "created_by": user_id,
+            "assigned_to": ticket_data.get('assigned_to_user_id')  # Use resolved user_id
+        }
+        
+        result = supabase.table("tickets").insert(ticket_record).execute()
+        
+        return {
+            "success": True,
+            "message": "Ticket created successfully",
+            "ticket": result.data[0] if result.data else None,
+            "validation": validation_result,
+            "priority": priority_result
+        }
+
